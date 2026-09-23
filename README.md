@@ -45,7 +45,13 @@ I build practical AI agents, reliable LLM systems, and open-source tools.
 ## Open-source quest log
 
 <!-- OSS_CONTRIBUTIONS:START -->
-_The first workflow run will replace this line with your merged contributions._
+**1 merged PRs · 1 projects**
+
+### [HKUDS/LightRAG](https://github.com/HKUDS/LightRAG) · 1 merged
+
+- 🐛 fix: pass document context to custom chunkers — [#4010](https://github.com/HKUDS/LightRAG/pull/4010) · 2026-09-19
+
+[View all merged pull requests →](https://github.com/pulls?q=is%3Apr%20author%3Adafyy321-pixel%20is%3Amerged)
 <!-- OSS_CONTRIBUTIONS:END -->
 
 <picture>

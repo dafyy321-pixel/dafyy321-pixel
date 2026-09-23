@@ -1,0 +1,52 @@
+name: Update profile
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-profile
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out profile repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Generate profile assets
+        env:
+          PROFILE_USER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+          mkdir -p assets
+          curl -fsSL --retry 3 "https://gh.crafter.run/$PROFILE_USER?theme=dark" -o assets/ascii-dark.svg
+          curl -fsSL --retry 3 "https://gh.crafter.run/$PROFILE_USER?theme=light" -o assets/ascii-light.svg
+          npx -y pacman-contribution-graph@3.0.0 --platform github --username "$PROFILE_USER" --gameTheme github-dark --output assets/pacman-dark.svg
+          npx -y pacman-contribution-graph@3.0.0 --platform github --username "$PROFILE_USER" --gameTheme github --output assets/pacman-light.svg
+
+      - name: Update merged contributions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PROFILE_USER: ${{ github.repository_owner }}
+        run: python scripts/update_contributions.py
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md assets
+          if git diff --cached --quiet; then
+            echo "Profile is already current."
+          else
+            git commit -m "chore: refresh profile"
+            git push
+          fi

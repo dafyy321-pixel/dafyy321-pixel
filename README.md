@@ -21,9 +21,9 @@
 
 - 🎓 Artificial Intelligence major focused on **AI agents, LLM systems, and open-source engineering**
 - 🧪 Hands-on AI engineering across **three internships**, spanning academic research and industry delivery
-- 🔭 Currently working as an AI intern at **[COMPANY / TEAM]**, building **[PROJECT / FOCUS]**
+- 🔭 Currently working as an AI intern 
 - 🌱 Contributing to open source and learning in public
-- 📫 Reach me at **[EMAIL / BLOG / SOCIAL LINK]**
+- 📫 Reach me at **[EMAIL]**
 
 <!-- Official seal source: Peking University Visual Identity Management Office — https://vim.pku.edu.cn/xzzq/index.htm -->
 <p>

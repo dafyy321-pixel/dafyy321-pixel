@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="./assets/header.svg" width="100%" alt="dafyy321-pixel — AI Agent · LLM Systems · Open Source Engineer">
+  <img src="./assets/header.svg" width="500%" alt="dafyy321-pixel — AI Agent · LLM Systems · Open Source Engineer">
 </p>
 
 <p align="center">

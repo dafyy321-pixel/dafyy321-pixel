@@ -52,11 +52,15 @@
 ## 开源贡献
 
 <!-- OSS_CONTRIBUTIONS:START -->
-**已合并 1 个 PR · 涉及 1 个项目**
+**已合并 2 个 PR · 涉及 2 个项目**
 
-### [HKUDS/LightRAG](https://github.com/HKUDS/LightRAG)
+### [Hisn00w/ASu-skills](https://github.com/Hisn00w/ASu-skills) · 1 个已合并
 
-- 🐛 为自定义分块器传递文档上下文 — [#4010](https://github.com/HKUDS/LightRAG/pull/4010) · 2026-09-19
+- 🐛 fix: prevent PDF export from overwriting the source HTML — [#163](https://github.com/Hisn00w/ASu-skills/pull/163) · 2026-09-23
+
+### [HKUDS/LightRAG](https://github.com/HKUDS/LightRAG) · 1 个已合并
+
+- 🐛 fix: pass document context to custom chunkers — [#4010](https://github.com/HKUDS/LightRAG/pull/4010) · 2026-09-19
 
 [查看全部已合并的 Pull Requests →](https://github.com/pulls?q=is%3Apr%20author%3Adafyy321-pixel%20is%3Amerged)
 <!-- OSS_CONTRIBUTIONS:END -->

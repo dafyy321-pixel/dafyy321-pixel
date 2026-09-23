@@ -25,11 +25,12 @@ jobs:
       - name: Generate profile assets
         env:
           PROFILE_USER: ${{ github.repository_owner }}
+          ASCII_COLS: "60"
         run: |
           set -euo pipefail
           mkdir -p assets
-          curl -fsSL --retry 3 "https://gh.crafter.run/$PROFILE_USER?theme=dark" -o assets/ascii-dark.svg
-          curl -fsSL --retry 3 "https://gh.crafter.run/$PROFILE_USER?theme=light" -o assets/ascii-light.svg
+          curl -fsSL --retry 3 "https://gh.crafter.run/$PROFILE_USER?theme=dark&cols=$ASCII_COLS" -o assets/ascii-dark.svg
+          curl -fsSL --retry 3 "https://gh.crafter.run/$PROFILE_USER?theme=light&cols=$ASCII_COLS" -o assets/ascii-light.svg
           npx -y pacman-contribution-graph@3.0.0 --platform github --username "$PROFILE_USER" --gameTheme github-dark --output assets/pacman-dark.svg
           npx -y pacman-contribution-graph@3.0.0 --platform github --username "$PROFILE_USER" --gameTheme github --output assets/pacman-light.svg
 

@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   schedule:
+    - cron: "7,27,47 * * * *"
     - cron: "17 6 * * *"
   workflow_dispatch:
 
@@ -23,6 +24,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Generate profile assets
+        if: github.event_name != 'schedule' || github.event.schedule == '17 6 * * *'
         env:
           PROFILE_USER: ${{ github.repository_owner }}
           ASCII_COLS: "60"
@@ -31,6 +33,7 @@ jobs:
           mkdir -p assets
           curl -fsSL --retry 3 "https://gh.crafter.run/$PROFILE_USER?theme=dark&cols=$ASCII_COLS" -o assets/ascii-dark.svg
           curl -fsSL --retry 3 "https://gh.crafter.run/$PROFILE_USER?theme=light&cols=$ASCII_COLS" -o assets/ascii-light.svg
+          python scripts/embed_ascii_portrait.py
           npx -y pacman-contribution-graph@3.0.0 --platform github --username "$PROFILE_USER" --gameTheme github-dark --output assets/pacman-dark.svg
           npx -y pacman-contribution-graph@3.0.0 --platform github --username "$PROFILE_USER" --gameTheme github --output assets/pacman-light.svg
 
@@ -44,7 +47,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md assets
+          git add README.md README.zh-CN.md assets
           if git diff --cached --quiet; then
             echo "Profile is already current."
           else

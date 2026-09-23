@@ -29,7 +29,7 @@
 <p>
   <img src="./assets/pku-seal.png" width="58" align="left" alt="Peking University seal">
   <strong>Research · Peking University Shenzhen Graduate School</strong><br>
-  Worked on <strong>[RESEARCH / ENGINEERING FOCUS]</strong>, connecting research ideas with working AI systems.
+  Worked on <strong>Ai Agent</strong>, connecting research ideas with working AI systems.
 </p>
 <br clear="left">
 

@@ -1,37 +1,44 @@
-<div align="center">
+<p align="right">
+  <strong>English</strong> · <a href="./README.zh-CN.md">简体中文</a>
+</p>
 
-![Header](https://capsule-render.vercel.app/api?type=waving&height=220&color=0:6F5CFF,100:2BB7DA&text=dafyy321-pixel&fontColor=FFFFFF&fontSize=44&fontAlignY=35&desc=AI%20Agent%20%C2%B7%20LLM%20Systems%20%C2%B7%20Open%20Source%20Engineer&descAlignY=56&descSize=18&animation=fadeIn)
+<p align="center">
+  <img src="./assets/header.svg" width="100%" alt="dafyy321-pixel — AI Agent · LLM Systems · Open Source Engineer">
+</p>
 
-### Hello, world 👋 · 你好，世界
+<p align="center">
+  <a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=18&duration=3200&pause=900&color=16866E&center=true&vCenter=true&width=620&lines=%3E+turning+model+output+into+working+systems_" alt="Typing SVG"></a>
+</p>
 
-I build practical AI agents, reliable LLM systems, and open-source tools.
-
-人工智能专业学生，关注 AI Agent、LLM Systems 与开源工程。
-
-![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
-![AI Agents](https://img.shields.io/badge/AI_Agents-6F5CFF?style=flat-square)
-![LLM Systems](https://img.shields.io/badge/LLM_Systems-2BB7DA?style=flat-square)
-
-</div>
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-306998?style=flat-square&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/AI_Agents-16866E?style=flat-square" alt="AI Agents">
+  <img src="https://img.shields.io/badge/LLM_Systems-31A88A?style=flat-square" alt="LLM Systems">
+</p>
 
 ## About me
 
-- 🎓 Artificial Intelligence major
-- 🔭 Currently an AI intern at **[COMPANY / TEAM]**
-- 🧪 Three AI internships, including one at **Peking University Shenzhen Graduate School**
-- 🤖 Exploring **[CURRENT AGENT / LLM SYSTEMS FOCUS]**
-- 🌱 Learning in public through open source
+- 🎓 Artificial Intelligence major focused on **AI agents, LLM systems, and open-source engineering**
+- 🧪 Hands-on AI engineering across **three internships**, spanning academic research and industry delivery
+- 🔭 Currently working as an AI intern at **[COMPANY / TEAM]**, building **[PROJECT / FOCUS]**
+- 🌱 Contributing to open source and learning in public
 - 📫 Reach me at **[EMAIL / BLOG / SOCIAL LINK]**
 
-> [中文一句话介绍或个人理念]
+<!-- Official seal source: Peking University Visual Identity Management Office — https://vim.pku.edu.cn/xzzq/index.htm -->
+<p>
+  <img src="./assets/pku-seal.png" width="58" align="left" alt="Peking University seal">
+  <strong>Research · Peking University Shenzhen Graduate School</strong><br>
+  Worked on <strong>[RESEARCH / ENGINEERING FOCUS]</strong>, connecting research ideas with working AI systems.
+</p>
+<br clear="left">
 
 ## System snapshot
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./assets/ascii-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="./assets/ascii-light.svg">
-  <img alt="dafyy321-pixel GitHub profile rendered as an ASCII system card" src="./assets/ascii-dark.svg" width="100%">
+  <img alt="dafyy321-pixel GitHub profile rendered as an ASCII system card" src="./assets/ascii-light.svg" width="100%">
 </picture>
 
 ## Selected builds
@@ -60,20 +67,10 @@ I build practical AI agents, reliable LLM systems, and open-source tools.
   <img alt="Pac-Man animation generated from dafyy321-pixel's GitHub contribution graph" src="./assets/pacman-light.svg" width="100%">
 </picture>
 
-## Experience
-
-| Period | Organization | Role and impact |
-|---|---|---|
-| **[NOW]** | **[CURRENT COMPANY / TEAM]** | AI Intern · **[PROJECT / MEASURABLE IMPACT]** |
-| **[DATES]** | Peking University Shenzhen Graduate School | AI Intern · **[RESEARCH OR ENGINEERING OUTCOME]** |
-| **[DATES]** | **[COMPANY / LAB]** | AI Intern · **[PROJECT / OUTCOME]** |
-
-<div align="center">
-
-### Let’s build useful AI systems.
-
-[Email](mailto:YOUR_EMAIL) · [Blog](YOUR_BLOG_URL) · [LinkedIn](YOUR_LINKEDIN_URL) · [Résumé](YOUR_RESUME_URL)
-
-![Footer](https://capsule-render.vercel.app/api?type=blur&height=110&color=0:6F5CFF,100:2BB7DA&section=footer)
-
-</div>
+<p align="center">
+  <strong>Let’s build useful AI systems.</strong><br><br>
+  <a href="mailto:YOUR_EMAIL">Email</a> ·
+  <a href="YOUR_BLOG_URL">Blog</a> ·
+  <a href="YOUR_LINKEDIN_URL">LinkedIn</a> ·
+  <a href="YOUR_RESUME_URL">Résumé</a>
+</p>

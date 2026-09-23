@@ -52,7 +52,11 @@
 ## Open-source quest log
 
 <!-- OSS_CONTRIBUTIONS:START -->
-**1 merged PRs · 1 projects**
+**2 merged PRs · 2 projects**
+
+### [Hisn00w/ASu-skills](https://github.com/Hisn00w/ASu-skills) · 1 merged
+
+- 🐛 fix: prevent PDF export from overwriting the source HTML — [#163](https://github.com/Hisn00w/ASu-skills/pull/163) · 2026-09-23
 
 ### [HKUDS/LightRAG](https://github.com/HKUDS/LightRAG) · 1 merged
 

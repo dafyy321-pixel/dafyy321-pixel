@@ -10,11 +10,6 @@
       <stop offset=".48" stop-color="#e8fbf5" stop-opacity=".38"/>
       <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="line" x1="0" x2="1">
-      <stop offset="0" stop-color="#16866e" stop-opacity="0"/>
-      <stop offset=".5" stop-color="#16866e"/>
-      <stop offset="1" stop-color="#16866e" stop-opacity="0"/>
-    </linearGradient>
   </defs>
 
   <rect width="1000" height="260" rx="20" fill="#ffffff"/>
@@ -22,21 +17,11 @@
   <rect width="1000" height="260" rx="20" fill="url(#grid)"/>
   <path d="M0 1H1000M0 259H1000" stroke="#16866e" stroke-opacity=".18"/>
 
-  <g fill="none" stroke="#16866e" stroke-opacity=".45" stroke-width="1.5">
-    <path d="M72 62H158V88H214"/>
-    <path d="M928 198H842V172H786"/>
-    <circle cx="72" cy="62" r="4" fill="#ffffff"/>
-    <circle cx="214" cy="88" r="4" fill="#ffffff"/>
-    <circle cx="928" cy="198" r="4" fill="#ffffff"/>
-    <circle cx="786" cy="172" r="4" fill="#ffffff"/>
-  </g>
-
   <g text-anchor="middle">
     <text x="500" y="119" fill="#202a29" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="48" font-weight="700" letter-spacing="-1.5">dafyy321-pixel</text>
     <text x="500" y="162" fill="#45645e" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" font-weight="500">AI Agent · LLM Systems · Open Source Engineer</text>
   </g>
 
-  <rect x="389" y="190" width="222" height="3" rx="1.5" fill="url(#line)"/>
   <g transform="translate(865 42)">
     <rect width="86" height="28" rx="8" fill="#ffffff" fill-opacity=".78" stroke="#16866e" stroke-opacity=".35"/>
     <text x="43" y="18" text-anchor="middle" fill="#16866e" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="10" font-weight="700" letter-spacing="1">AI / LLM</text>

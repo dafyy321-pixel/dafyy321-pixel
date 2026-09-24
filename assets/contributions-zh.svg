@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="212" viewBox="0 0 1000 212" role="img" aria-label="自动更新的开源贡献记录">
+  <!-- Pixel icons: Pixelarticons by Gerrit Halfmann, MIT license. -->
+  <rect width="1000" height="100%" fill="#ffffff"/>
+  <path d="M36 56H964" stroke="#dfe7e4"/>
+  <text x="36" y="36" fill="#26322f" font-family="Inter, Segoe UI, Arial, Microsoft YaHei, sans-serif" font-size="14" font-weight="700">已合并 2 个 PR / 2 个项目</text>
+  <text x="964" y="36" text-anchor="end" fill="#16866e" font-family="Consolas, monospace" font-size="12" font-weight="700">AUTO-SYNC</text>
+  <path d="M66 101V163" stroke="#b9c9c4" stroke-width="2"/>
+  <rect x="48" y="83" width="36" height="36" rx="3" fill="#ffffff" stroke="#bdc9c5"/>
+  <g transform="translate(54 89)" fill="#26322f">
+    <path d="M2 5h2v4H2zm20 0h-2v4h2zM4 9h2v2H4zm16 0h-2v2h2zM2 13h4v2H2zm20 0h-4v2h4zM4 17h2v2H4zm16 0h-2v2h2zM2 19h2v2H2zm20 0h-2v2h2zM6 11h12v2H6z"/>
+    <path d="M6 7h2v12H6zm10 0h2v12h-2zM8 19h8v2H8zM8 5h8v2H8zM11 15h2v6h-2zM8 1h2v6H8zm6 0h2v6h-2z"/>
+  </g>
+  <text x="104" y="97" fill="#202a29" font-family="Inter, Segoe UI, Arial, Microsoft YaHei, sans-serif" font-size="15" font-weight="700">Hisn00w/ASu-skills <tspan fill="#6c7975" font-weight="400">/ #163</tspan></text>
+  <text x="104" y="119" fill="#52625d" font-family="Inter, Segoe UI, Arial, Microsoft YaHei, sans-serif" font-size="13">fix: prevent PDF export from overwriting the source HTML</text>
+  <text x="964" y="106" text-anchor="end" fill="#16866e" font-family="Consolas, monospace" font-size="12" font-weight="700">[ FIX ]  2026-09-23</text>
+  <rect x="48" y="145" width="36" height="36" rx="3" fill="#ffffff" stroke="#bdc9c5"/>
+  <g transform="translate(54 151)" fill="#26322f">
+    <path d="M2 5h2v4H2zm20 0h-2v4h2zM4 9h2v2H4zm16 0h-2v2h2zM2 13h4v2H2zm20 0h-4v2h4zM4 17h2v2H4zm16 0h-2v2h2zM2 19h2v2H2zm20 0h-2v2h2zM6 11h12v2H6z"/>
+    <path d="M6 7h2v12H6zm10 0h2v12h-2zM8 19h8v2H8zM8 5h8v2H8zM11 15h2v6h-2zM8 1h2v6H8zm6 0h2v6h-2z"/>
+  </g>
+  <text x="104" y="159" fill="#202a29" font-family="Inter, Segoe UI, Arial, Microsoft YaHei, sans-serif" font-size="15" font-weight="700">HKUDS/LightRAG <tspan fill="#6c7975" font-weight="400">/ #4010</tspan></text>
+  <text x="104" y="181" fill="#52625d" font-family="Inter, Segoe UI, Arial, Microsoft YaHei, sans-serif" font-size="13">fix: pass document context to custom chunkers</text>
+  <text x="964" y="168" text-anchor="end" fill="#16866e" font-family="Consolas, monospace" font-size="12" font-weight="700">[ FIX ]  2026-09-19</text>
+</svg>

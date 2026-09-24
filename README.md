@@ -52,15 +52,9 @@
 ## Open-source quest log
 
 <!-- OSS_CONTRIBUTIONS:START -->
-**2 merged PRs · 2 projects**
-
-### [Hisn00w/ASu-skills](https://github.com/Hisn00w/ASu-skills) · 1 merged
-
-- 🐛 fix: prevent PDF export from overwriting the source HTML — [#163](https://github.com/Hisn00w/ASu-skills/pull/163) · 2026-09-23
-
-### [HKUDS/LightRAG](https://github.com/HKUDS/LightRAG) · 1 merged
-
-- 🐛 fix: pass document context to custom chunkers — [#4010](https://github.com/HKUDS/LightRAG/pull/4010) · 2026-09-19
+<p align="center">
+  <a href="https://github.com/pulls?q=is%3Apr%20author%3Adafyy321-pixel%20is%3Amerged"><img src="./assets/contributions.svg" width="100%" alt="Automatically updated open-source contributions"></a>
+</p>
 
 [View all merged pull requests →](https://github.com/pulls?q=is%3Apr%20author%3Adafyy321-pixel%20is%3Amerged)
 <!-- OSS_CONTRIBUTIONS:END -->

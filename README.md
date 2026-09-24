@@ -41,14 +41,6 @@
   <img alt="dafyy321-pixel GitHub profile rendered as an ASCII system card" src="./assets/ascii-light.svg" width="100%">
 </picture>
 
-## Selected builds
-
-| Project | What it does | Stack |
-|---|---|---|
-| [open-source-contributor](https://github.com/dafyy321-pixel/open-source-contributor) | A Codex skill for finding, validating, and delivering meaningful open-source contributions. | Python · Agent workflow |
-| [decision-dish](https://github.com/dafyy321-pixel/decision-dish) | **[Add one sentence explaining the user problem and your contribution.]** | TypeScript · **[STACK]** |
-| [SnapCal](https://github.com/dafyy321-pixel/SnapCal) | **[Add one sentence explaining the user problem and your contribution.]** | TypeScript · **[STACK]** |
-
 ## Open-source quest log
 
 <!-- OSS_CONTRIBUTIONS:START -->

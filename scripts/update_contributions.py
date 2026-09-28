@@ -42,6 +42,7 @@ SVG_ICONS = {
         "M4 2h4v2H4zm0 6h4v2H4zM2 4h2v4H2zm6 0h2v4H8zm8 10h4v2h-4zm0 6h4v2h-4zm-2-4h2v4h-2zm6 0h2v4h-2zM5 12h2v10H5zm7 0h2v2h-2zm-2-2h2v2h-2z",
     ),
 }
+STAR_ICON = "M5 20H8V22H3V16H5V20ZM21 22H16V20H19V16H21V22ZM10 20H8V18H10V20ZM16 20H14V18H16V20ZM14 18H10V16H14V18ZM7 16H5V13H7V16ZM19 16H17V13H19V16ZM5 13H3V11H5V13ZM21 13H19V11H21V13ZM9 9H3V11H1V7H9V9ZM23 11H21V9H15V7H23V11ZM11 7H9V3H11V7ZM15 7H13V3H15V7ZM13 3H11V1H13V3Z"
 
 KIND_LABELS = {
     "fix": "FIX",
@@ -74,6 +75,24 @@ def fetch_merged_prs(username: str, token: str) -> list[dict]:
         for item in payload["items"]
         if repo_name(item).split("/", 1)[0].lower() != username.lower()
     ]
+
+
+def fetch_repo_stars(prs: list[dict], token: str) -> dict[str, int]:
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "github-profile-readme-updater",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    stars = {}
+    for item in visible_prs(prs):
+        repo = repo_name(item)
+        if repo not in stars:
+            request = Request(item["repository_url"], headers=headers)
+            with urlopen(request, timeout=30) as response:
+                stars[repo] = json.load(response)["stargazers_count"]
+    return stars
 
 
 def repo_name(item: dict) -> str:
@@ -109,7 +128,14 @@ def truncate(text: str, limit: int) -> str:
     return normalized if len(normalized) <= limit else f"{normalized[: limit - 1].rstrip()}…"
 
 
-def render_svg(prs: list[dict], language: str = "en") -> str:
+def format_stars(count: int) -> str:
+    if count < 1000:
+        return str(count)
+    value, suffix = (count / 1_000_000, "m") if count >= 1_000_000 else (count / 1000, "k")
+    return f"{value:.1f}".rstrip("0").rstrip(".") + suffix
+
+
+def render_svg(prs: list[dict], stars: dict[str, int], language: str = "en") -> str:
     rows = visible_prs(prs)
     project_count = len({repo_name(item) for item in prs})
     row_height = 62
@@ -156,6 +182,7 @@ def render_svg(prs: list[dict], language: str = "en") -> str:
                 or ""
             )[:10]
             repo = html.escape(truncate(repo_name(item), 42))
+            star_count = format_stars(stars[repo_name(item)])
             title = html.escape(truncate(item["title"], 76), quote=False)
             label = KIND_LABELS[kind]
             parts.extend(
@@ -165,6 +192,8 @@ def render_svg(prs: list[dict], language: str = "en") -> str:
                     *(f'    <path d="{path}"/>' for path in SVG_ICONS[kind]),
                     "  </g>",
                     f'  <text x="104" y="{center - 4}" fill="#202a29" font-family="Inter, Segoe UI, Arial, Microsoft YaHei, sans-serif" font-size="15" font-weight="700">{repo} <tspan fill="#6c7975" font-weight="400">/ #{number}</tspan></text>',
+                    f'  <text x="762" y="{center + 6}" text-anchor="end" fill="#26322f" font-family="Consolas, monospace" font-size="16" font-weight="700">{star_count}</text>',
+                    f'  <path d="{STAR_ICON}" transform="translate(770 {center - 12})" fill="#26322f"/>',
                     f'  <text x="104" y="{center + 18}" fill="#52625d" font-family="Inter, Segoe UI, Arial, Microsoft YaHei, sans-serif" font-size="13">{title}</text>',
                     f'  <text x="964" y="{center + 5}" text-anchor="end" fill="#16866e" font-family="Consolas, monospace" font-size="12" font-weight="700">[ {label} ]  {merged_at}</text>',
                 ]
@@ -217,9 +246,11 @@ def self_test() -> None:
         "html_url": "https://github.com/example/project/pull/42",
         "pull_request": {"merged_at": "2026-09-23T12:00:00Z"},
     }
-    svg = render_svg([fixture])
+    svg = render_svg([fixture], {"example/project": 1234})
     ET.fromstring(svg)
     assert "example/project" in svg and "#42" in svg and "[ FIX ]" in svg
+    assert 'font-size="16" font-weight="700">1.2k</text>' in svg and STAR_ICON in svg
+    assert [format_stars(count) for count in (0, 999, 1000, 1234, 1_000_000)] == ["0", "999", "1k", "1.2k", "1m"]
     assert "🐛" not in svg
     assert {
         contribution_kind("fix: handle empty input"),
@@ -255,10 +286,11 @@ def main() -> int:
         return 2
 
     prs = fetch_merged_prs(username, token)
+    stars = fetch_repo_stars(prs, token)
     assets_dir = Path(args.assets_dir)
     assets_dir.mkdir(parents=True, exist_ok=True)
-    write_if_changed(assets_dir / "contributions.svg", render_svg(prs))
-    write_if_changed(assets_dir / "contributions-zh.svg", render_svg(prs, "zh"))
+    write_if_changed(assets_dir / "contributions.svg", render_svg(prs, stars))
+    write_if_changed(assets_dir / "contributions-zh.svg", render_svg(prs, stars, "zh"))
 
     for readme_path, language in (
         (Path(args.readme), "en"),

@@ -4,9 +4,11 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import html
 import json
 import os
+import re
 import sys
 import xml.etree.ElementTree as ET
 from collections import defaultdict
@@ -43,6 +45,13 @@ SVG_ICONS = {
     ),
 }
 STAR_ICON = "M5 20H8V22H3V16H5V20ZM21 22H16V20H19V16H21V22ZM10 20H8V18H10V20ZM16 20H14V18H16V20ZM14 18H10V16H14V18ZM7 16H5V13H7V16ZM19 16H17V13H19V16ZM5 13H3V11H5V13ZM21 13H19V11H21V13ZM9 9H3V11H1V7H9V9ZM23 11H21V9H15V7H23V11ZM11 7H9V3H11V7ZM15 7H13V3H15V7ZM13 3H11V1H13V3Z"
+
+# Only these README badges are considered project honors. Technical metadata
+# badges (languages, licenses, CI, releases, downloads, and so on) are ignored.
+HONOR_BADGE_MAX = 3
+HONOR_BADGE_ATTR = re.compile(r"([:\w-]+)\s*=\s*([\"'])(.*?)\2", re.IGNORECASE | re.DOTALL)
+HONOR_BADGE_IMG = re.compile(r"<img\b[^>]*>", re.IGNORECASE | re.DOTALL)
+HONOR_BADGE_MARKDOWN = re.compile(r"!\[([^]]*)\]\((\S+?)(?:\s+['\"][^)]*['\"])?\)")
 
 KIND_LABELS = {
     "fix": "FIX",
@@ -95,6 +104,98 @@ def fetch_repo_stars(prs: list[dict], token: str) -> dict[str, int]:
     return stars
 
 
+def fetch_repo_readme(repo: str, token: str) -> str:
+    """Fetch a repository README as plain text, returning empty text on failure."""
+    headers = {
+        "Accept": "application/vnd.github.raw",
+        "User-Agent": "github-profile-readme-updater",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    request = Request(f"https://api.github.com/repos/{repo}/readme", headers=headers)
+    try:
+        with urlopen(request, timeout=30) as response:
+            return response.read().decode("utf-8", "replace")
+    except Exception:
+        return ""
+
+
+def honor_badge_kind(label: str, source: str) -> str | None:
+    """Return a small category for supported honor/trend badges only."""
+    haystack = f"{label} {source}".lower().replace("&amp;", "&")
+    if "api.star-history.com/badge" in haystack and "type=trending" in haystack:
+        return "trending"
+    if "api.star-history.com/badge" in haystack and "type=rank" in haystack:
+        return "rank"
+    if "repository of the day" in haystack:
+        return "trending"
+    if "global rank" in haystack or "star history rank" in haystack:
+        return "rank"
+    # Trendshift's badge is a second common source for the same GitHub
+    # Trending / Repository of the Day honor shown in the reference image.
+    if "trendshift.io/api/badge" in haystack and "trend" in haystack:
+        return "trending"
+    return None
+
+
+def parse_honor_badges(readme: str) -> list[dict]:
+    """Extract supported badge image URLs from README HTML/Markdown."""
+    candidates: list[dict] = []
+    seen: set[str] = set()
+    for match in HONOR_BADGE_IMG.finditer(readme):
+        attrs = {name.lower(): value for name, _, value in HONOR_BADGE_ATTR.findall(match.group(0))}
+        source = attrs.get("src", "").replace("&amp;", "&")
+        if source.startswith("//"):
+            source = f"https:{source}"
+        label = attrs.get("alt", "")
+        kind = honor_badge_kind(label, source)
+        if kind and source and source not in seen:
+            seen.add(source)
+            candidates.append({"kind": kind, "label": label, "source": source})
+    for match in HONOR_BADGE_MARKDOWN.finditer(readme):
+        label, source = match.groups()
+        source = source.replace("&amp;", "&")
+        if source.startswith("//"):
+            source = f"https:{source}"
+        kind = honor_badge_kind(label, source)
+        if kind and source and source not in seen:
+            seen.add(source)
+            candidates.append({"kind": kind, "label": label, "source": source})
+    return candidates[:HONOR_BADGE_MAX]
+
+
+def fetch_badge_image(source: str) -> str:
+    """Download a badge and return a data URI so the generated SVG is self-contained."""
+    try:
+        request = Request(source, headers={"User-Agent": "github-profile-readme-updater"})
+        with urlopen(request, timeout=20) as response:
+            content = response.read()
+            content_type = response.headers.get_content_type() or "image/svg+xml"
+        if not content_type.startswith("image/"):
+            content_type = "image/svg+xml"
+        return f"data:{content_type};base64,{base64.b64encode(content).decode('ascii')}"
+    except Exception:
+        return ""
+
+
+def fetch_repo_honor_badges(prs: list[dict], token: str) -> dict[str, list[dict]]:
+    """Fetch supported honor badges for each visible project."""
+    badges: dict[str, list[dict]] = {}
+    for item in visible_prs(prs):
+        repo = repo_name(item)
+        if repo in badges:
+            continue
+        parsed = parse_honor_badges(fetch_repo_readme(repo, token))
+        loaded = []
+        for badge in parsed:
+            image = fetch_badge_image(badge["source"])
+            if image:
+                loaded.append({**badge, "image": image})
+        badges[repo] = loaded
+    return badges
+
+
 def repo_name(item: dict) -> str:
     path = urlparse(item["repository_url"]).path.strip("/")
     return path.removeprefix("repos/")
@@ -135,7 +236,13 @@ def format_stars(count: int) -> str:
     return f"{value:.1f}".rstrip("0").rstrip(".") + suffix
 
 
-def render_svg(prs: list[dict], stars: dict[str, int], language: str = "en") -> str:
+def render_svg(
+    prs: list[dict],
+    stars: dict[str, int],
+    badges: dict[str, list[dict]] | None = None,
+    language: str = "en",
+) -> str:
+    badges = badges or {}
     rows = visible_prs(prs)
     project_count = len({repo_name(item) for item in prs})
     row_height = 62
@@ -185,6 +292,8 @@ def render_svg(prs: list[dict], stars: dict[str, int], language: str = "en") -> 
             star_count = format_stars(stars[repo_name(item)])
             title = html.escape(truncate(item["title"], 76), quote=False)
             label = KIND_LABELS[kind]
+            repo_badges = badges.get(repo_name(item), [])[:HONOR_BADGE_MAX]
+            badge_start = 756 - len(repo_badges) * 104
             parts.extend(
                 [
                     f'  <rect x="48" y="{top}" width="36" height="36" rx="3" fill="#ffffff" stroke="#bdc9c5"/>',
@@ -192,6 +301,10 @@ def render_svg(prs: list[dict], stars: dict[str, int], language: str = "en") -> 
                     *(f'    <path d="{path}"/>' for path in SVG_ICONS[kind]),
                     "  </g>",
                     f'  <text x="104" y="{center - 4}" fill="#202a29" font-family="Inter, Segoe UI, Arial, Microsoft YaHei, sans-serif" font-size="15" font-weight="700">{repo} <tspan fill="#6c7975" font-weight="400">/ #{number}</tspan></text>',
+                    *(
+                        f'  <image x="{badge_start + badge_index * 104}" y="{center - 11}" width="96" height="22" preserveAspectRatio="xMidYMid meet" href="{badge["image"]}"><title>{html.escape(badge.get("label", "Project honor badge"))}</title></image>'
+                        for badge_index, badge in enumerate(repo_badges)
+                    ),
                     f'  <text x="762" y="{center + 6}" text-anchor="end" fill="#26322f" font-family="Consolas, monospace" font-size="16" font-weight="700">{star_count}</text>',
                     f'  <path d="{STAR_ICON}" transform="translate(770 {center - 12})" fill="#26322f"/>',
                     f'  <text x="104" y="{center + 18}" fill="#52625d" font-family="Inter, Segoe UI, Arial, Microsoft YaHei, sans-serif" font-size="13">{title}</text>',
@@ -246,10 +359,23 @@ def self_test() -> None:
         "html_url": "https://github.com/example/project/pull/42",
         "pull_request": {"merged_at": "2026-09-23T12:00:00Z"},
     }
-    svg = render_svg([fixture], {"example/project": 1234})
+    fixture_badge = {
+        "kind": "trending",
+        "label": "GitHub Trending Repository of the Day",
+        "source": "https://api.star-history.com/badge?repo=example/project&type=trending",
+        "image": "data:image/svg+xml;base64,PHN2Zy8+",
+    }
+    svg = render_svg([fixture], {"example/project": 1234}, {"example/project": [fixture_badge]})
     ET.fromstring(svg)
     assert "example/project" in svg and "#42" in svg and "[ FIX ]" in svg
     assert 'font-size="16" font-weight="700">1.2k</text>' in svg and STAR_ICON in svg
+    assert 'data:image/svg+xml;base64,PHN2Zy8+' in svg
+    parsed = parse_honor_badges(
+        '<img alt="GitHub Trending Repository of the Day" src="https://api.star-history.com/badge?repo=x/y&amp;type=trending">'
+        '<img alt="Python" src="https://img.shields.io/badge/Python">'
+        '<img alt="Star History Rank" src="https://api.star-history.com/badge?repo=x/y&amp;type=rank">'
+    )
+    assert [badge["kind"] for badge in parsed] == ["trending", "rank"]
     assert [format_stars(count) for count in (0, 999, 1000, 1234, 1_000_000)] == ["0", "999", "1k", "1.2k", "1m"]
     assert "🐛" not in svg
     assert {
@@ -287,10 +413,11 @@ def main() -> int:
 
     prs = fetch_merged_prs(username, token)
     stars = fetch_repo_stars(prs, token)
+    badges = fetch_repo_honor_badges(prs, token)
     assets_dir = Path(args.assets_dir)
     assets_dir.mkdir(parents=True, exist_ok=True)
-    write_if_changed(assets_dir / "contributions.svg", render_svg(prs, stars))
-    write_if_changed(assets_dir / "contributions-zh.svg", render_svg(prs, stars, "zh"))
+    write_if_changed(assets_dir / "contributions.svg", render_svg(prs, stars, badges))
+    write_if_changed(assets_dir / "contributions-zh.svg", render_svg(prs, stars, badges, "zh"))
 
     for readme_path, language in (
         (Path(args.readme), "en"),

@@ -293,7 +293,18 @@ def render_svg(
             title = html.escape(truncate(item["title"], 76), quote=False)
             label = KIND_LABELS[kind]
             repo_badges = badges.get(repo_name(item), [])[:HONOR_BADGE_MAX]
-            badge_start = 756 - len(repo_badges) * 104
+            badge_count = len(repo_badges)
+            # Keep the badge group clear of the right-aligned Star count. A
+            # single badge gets more room for readable text; three badges fit
+            # compactly across the center gap.
+            badge_width, badge_height = {
+                1: (144, 32),
+                2: (124, 29),
+                3: (108, 26),
+            }.get(badge_count, (0, 0))
+            badge_gap = 8
+            badge_right = 708
+            badge_start = badge_right - badge_count * badge_width - max(badge_count - 1, 0) * badge_gap
             parts.extend(
                 [
                     f'  <rect x="48" y="{top}" width="36" height="36" rx="3" fill="#ffffff" stroke="#bdc9c5"/>',
@@ -302,7 +313,7 @@ def render_svg(
                     "  </g>",
                     f'  <text x="104" y="{center - 4}" fill="#202a29" font-family="Inter, Segoe UI, Arial, Microsoft YaHei, sans-serif" font-size="15" font-weight="700">{repo} <tspan fill="#6c7975" font-weight="400">/ #{number}</tspan></text>',
                     *(
-                        f'  <image x="{badge_start + badge_index * 104}" y="{center - 11}" width="96" height="22" preserveAspectRatio="xMidYMid meet" href="{badge["image"]}"><title>{html.escape(badge.get("label", "Project honor badge"))}</title></image>'
+                        f'  <image x="{badge_start + badge_index * (badge_width + badge_gap)}" y="{center - badge_height // 2}" width="{badge_width}" height="{badge_height}" preserveAspectRatio="xMidYMid meet" href="{badge["image"]}"><title>{html.escape(badge.get("label", "Project honor badge"))}</title></image>'
                         for badge_index, badge in enumerate(repo_badges)
                     ),
                     f'  <text x="762" y="{center + 6}" text-anchor="end" fill="#26322f" font-family="Consolas, monospace" font-size="16" font-weight="700">{star_count}</text>',

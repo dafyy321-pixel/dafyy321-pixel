@@ -32,7 +32,7 @@
     <path d="M4 2h4v2H4zm0 6h4v2H4zM2 4h2v4H2zm6 0h2v4H8zm8 10h4v2h-4zm0 6h4v2h-4zm-2-4h2v4h-2zm6 0h2v4h-2zM5 12h2v10H5zm7 0h2v2h-2zm-2-2h2v2h-2z"/>
   </g>
   <text x="104" y="221" fill="#202a29" font-family="Inter, Segoe UI, Arial, Microsoft YaHei, sans-serif" font-size="15" font-weight="700">pydantic/pydantic-ai <tspan fill="#6c7975" font-weight="400">/ #9092</tspan></text>
-  <text x="762" y="231" text-anchor="end" fill="#26322f" font-family="Consolas, monospace" font-size="16" font-weight="700">20.4k</text>
+  <text x="762" y="231" text-anchor="end" fill="#26322f" font-family="Consolas, monospace" font-size="16" font-weight="700">20.5k</text>
   <path d="M5 20H8V22H3V16H5V20ZM21 22H16V20H19V16H21V22ZM10 20H8V18H10V20ZM16 20H14V18H16V20ZM14 18H10V16H14V18ZM7 16H5V13H7V16ZM19 16H17V13H19V16ZM5 13H3V11H5V13ZM21 13H19V11H21V13ZM9 9H3V11H1V7H9V9ZM23 11H21V9H15V7H23V11ZM11 7H9V3H11V7ZM15 7H13V3H15V7ZM13 3H11V1H13V3Z" transform="translate(770 213)" fill="#26322f"/>
   <text x="104" y="243" fill="#52625d" font-family="Inter, Segoe UI, Arial, Microsoft YaHei, sans-serif" font-size="13">Terminate `!command` shell descendants on cancellation in `clai2`</text>
   <text x="964" y="230" text-anchor="end" fill="#16866e" font-family="Consolas, monospace" font-size="12" font-weight="700">[ PR ]  2026-09-29</text>

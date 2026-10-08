@@ -11,15 +11,13 @@ import os
 import re
 import sys
 import xml.etree.ElementTree as ET
-from collections import defaultdict
 from pathlib import Path
 from urllib.parse import quote, urlparse
 from urllib.request import Request, urlopen
 
 START = "<!-- OSS_CONTRIBUTIONS:START -->"
 END = "<!-- OSS_CONTRIBUTIONS:END -->"
-MAX_REPOS = 5
-MAX_PRS_PER_REPO = 3
+PAGE_SIZE = 10
 
 # Pixelarticons by Gerrit Halfmann, MIT licensed. See assets/PIXELARTICONS-LICENSE.txt.
 SVG_ICONS = {
@@ -64,11 +62,7 @@ KIND_LABELS = {
 
 
 def fetch_merged_prs(username: str, token: str) -> list[dict]:
-    query = f"is:pr is:merged author:{username} -user:{username} archived:false"
-    url = (
-        "https://api.github.com/search/issues"
-        f"?q={quote(query)}&sort=updated&order=desc&per_page=100"
-    )
+    query = f"is:pr is:merged author:{username} -user:{username}"
     headers = {
         "Accept": "application/vnd.github+json",
         "User-Agent": "github-profile-readme-updater",
@@ -76,14 +70,27 @@ def fetch_merged_prs(username: str, token: str) -> list[dict]:
     }
     if token:
         headers["Authorization"] = f"Bearer {token}"
-    request = Request(url, headers=headers)
-    with urlopen(request, timeout=30) as response:
-        payload = json.load(response)
-    return [
+    items = []
+    for page in range(1, 11):  # GitHub Search exposes at most 1,000 results.
+        url = (
+            "https://api.github.com/search/issues"
+            f"?q={quote(query)}&sort=updated&order=desc&per_page=100&page={page}"
+        )
+        with urlopen(Request(url, headers=headers), timeout=30) as response:
+            payload = json.load(response)
+        items.extend(payload["items"])
+        if len(items) >= payload["total_count"] or not payload["items"]:
+            break
+    prs = [
         item
-        for item in payload["items"]
+        for item in items
         if repo_name(item).split("/", 1)[0].lower() != username.lower()
     ]
+    return sorted(
+        prs,
+        key=lambda item: item.get("pull_request", {}).get("merged_at") or item.get("closed_at") or "",
+        reverse=True,
+    )
 
 
 def fetch_repo_stars(prs: list[dict], token: str) -> dict[str, int]:
@@ -95,7 +102,7 @@ def fetch_repo_stars(prs: list[dict], token: str) -> dict[str, int]:
     if token:
         headers["Authorization"] = f"Bearer {token}"
     stars = {}
-    for item in visible_prs(prs):
+    for item in prs:
         repo = repo_name(item)
         if repo not in stars:
             request = Request(item["repository_url"], headers=headers)
@@ -180,9 +187,9 @@ def fetch_badge_image(source: str) -> str:
 
 
 def fetch_repo_honor_badges(prs: list[dict], token: str) -> dict[str, list[dict]]:
-    """Fetch supported honor badges for each visible project."""
+    """Fetch supported honor badges for each listed project."""
     badges: dict[str, list[dict]] = {}
-    for item in visible_prs(prs):
+    for item in prs:
         repo = repo_name(item)
         if repo in badges:
             continue
@@ -213,17 +220,6 @@ def contribution_kind(title: str) -> str:
     return next((kind for prefixes, kind in kinds if lowered.startswith(prefixes)), "other")
 
 
-def visible_prs(prs: list[dict]) -> list[dict]:
-    groups: dict[str, list[dict]] = defaultdict(list)
-    for item in prs:
-        groups[repo_name(item)].append(item)
-    return [
-        item
-        for items in list(groups.values())[:MAX_REPOS]
-        for item in items[:MAX_PRS_PER_REPO]
-    ]
-
-
 def truncate(text: str, limit: int) -> str:
     normalized = " ".join(text.split())
     return normalized if len(normalized) <= limit else f"{normalized[: limit - 1].rstrip()}…"
@@ -241,19 +237,21 @@ def render_svg(
     stars: dict[str, int],
     badges: dict[str, list[dict]] | None = None,
     language: str = "en",
+    page: int = 1,
 ) -> str:
     badges = badges or {}
-    rows = visible_prs(prs)
+    rows = prs[(page - 1) * PAGE_SIZE : page * PAGE_SIZE]
+    page_count = max(1, (len(prs) + PAGE_SIZE - 1) // PAGE_SIZE)
     project_count = len({repo_name(item) for item in prs})
     row_height = 62
     header_height = 70
     height = header_height + max(len(rows), 1) * row_height + 18
     if language == "zh":
-        count_label = f"已合并 {len(prs)} 个 PR / {project_count} 个项目"
+        count_label = f"已合并 {len(prs)} 个 PR / {project_count} 个项目 · 第 {page}/{page_count} 页"
         empty_label = "还没有已合并的外部 PR"
         alt = "自动更新的开源贡献记录"
     else:
-        count_label = f"{len(prs)} MERGED PRS / {project_count} PROJECTS"
+        count_label = f"{len(prs)} MERGED PRS / {project_count} PROJECTS · PAGE {page}/{page_count}"
         empty_label = "NO MERGED EXTERNAL PRS YET"
         alt = "Automatically updated open-source contributions"
 
@@ -331,19 +329,43 @@ def render(prs: list[dict], username: str, language: str = "en") -> str:
     query = quote(f"is:pr author:{username} is:merged")
     url = f"https://github.com/pulls?q={query}"
     if language == "zh":
-        asset = "contributions-zh.svg"
         alt = "自动更新的开源贡献记录"
         all_label = "查看全部已合并的 Pull Requests →"
     else:
-        asset = "contributions.svg"
         alt = "Automatically updated open-source contributions"
         all_label = "View all merged pull requests →"
-    return (
-        '<p align="center">\n'
-        f'  <a href="{url}"><img src="./assets/{asset}" width="100%" alt="{alt}"></a>\n'
-        "</p>\n\n"
-        f"[{all_label}]({url})"
-    )
+    pages = max(1, (len(prs) + PAGE_SIZE - 1) // PAGE_SIZE)
+    sections = []
+    for page in range(1, pages + 1):
+        asset = asset_name(language, page)
+        image = (
+            '<p align="center">\n'
+            f'  <a href="{url}"><img src="./assets/{asset}" width="100%" alt="{alt}"></a>\n'
+            "</p>"
+        )
+        if pages == 1:
+            sections.append(image)
+            continue
+        start = (page - 1) * PAGE_SIZE + 1
+        end = min(page * PAGE_SIZE, len(prs))
+        summary = (
+            f"第 {page}/{pages} 页 · PR {start}–{end}"
+            if language == "zh"
+            else f"Page {page}/{pages} · PRs {start}–{end}"
+        )
+        sections.append(
+            f'<details name="oss-page"{" open" if page == 1 else ""}>\n'
+            f"<summary>{summary}</summary>\n\n"
+            f"{image}\n\n"
+            "</details>"
+        )
+    return "\n\n".join(sections) + f"\n\n[{all_label}]({url})"
+
+
+def asset_name(language: str, page: int) -> str:
+    suffix = "-zh" if language == "zh" else ""
+    page_suffix = f"-page-{page}" if page > 1 else ""
+    return f"contributions{suffix}{page_suffix}.svg"
 
 
 def replace_section(readme: str, generated: str) -> str:
@@ -400,6 +422,16 @@ def self_test() -> None:
     generated = render([fixture], "dafyy321-pixel")
     assert "assets/contributions.svg" in generated
     assert "assets/contributions-zh.svg" in render([fixture], "dafyy321-pixel", "zh")
+    paged_prs = [{**fixture, "number": number} for number in range(11, 0, -1)]
+    page_one = render_svg(paged_prs, {"example/project": 1234}, page=1)
+    page_two = render_svg(paged_prs, {"example/project": 1234}, page=2)
+    assert page_one.count('font-weight="700">example/project') == 10
+    assert page_two.count('font-weight="700">example/project') == 1
+    assert "/ #11" in page_one and "/ #1" in page_two and "/ #11" not in page_two
+    paged_readme = render(paged_prs, "dafyy321-pixel")
+    assert '<details name="oss-page" open>' in paged_readme
+    assert 'assets/contributions-page-2.svg' in paged_readme
+    assert "Page 2/2 · PRs 11–11" in paged_readme
     replaced = replace_section(f"before\n{START}\nold\n{END}\nafter\n", generated)
     assert "old" not in replaced and replaced.count(START) == replaced.count(END) == 1
     print("self-test passed")
@@ -427,8 +459,13 @@ def main() -> int:
     badges = fetch_repo_honor_badges(prs, token)
     assets_dir = Path(args.assets_dir)
     assets_dir.mkdir(parents=True, exist_ok=True)
-    write_if_changed(assets_dir / "contributions.svg", render_svg(prs, stars, badges))
-    write_if_changed(assets_dir / "contributions-zh.svg", render_svg(prs, stars, badges, "zh"))
+    pages = max(1, (len(prs) + PAGE_SIZE - 1) // PAGE_SIZE)
+    for language in ("en", "zh"):
+        for page in range(1, pages + 1):
+            write_if_changed(
+                assets_dir / asset_name(language, page),
+                render_svg(prs, stars, badges, language, page),
+            )
 
     for readme_path, language in (
         (Path(args.readme), "en"),

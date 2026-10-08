@@ -44,9 +44,23 @@
 ## Open-source quest log
 
 <!-- OSS_CONTRIBUTIONS:START -->
+<details name="oss-page" open>
+<summary>Page 1/2 · PRs 1–10</summary>
+
 <p align="center">
   <a href="https://github.com/pulls?q=is%3Apr%20author%3Adafyy321-pixel%20is%3Amerged"><img src="./assets/contributions.svg" width="100%" alt="Automatically updated open-source contributions"></a>
 </p>
+
+</details>
+
+<details name="oss-page">
+<summary>Page 2/2 · PRs 11–12</summary>
+
+<p align="center">
+  <a href="https://github.com/pulls?q=is%3Apr%20author%3Adafyy321-pixel%20is%3Amerged"><img src="./assets/contributions-page-2.svg" width="100%" alt="Automatically updated open-source contributions"></a>
+</p>
+
+</details>
 
 [View all merged pull requests →](https://github.com/pulls?q=is%3Apr%20author%3Adafyy321-pixel%20is%3Amerged)
 <!-- OSS_CONTRIBUTIONS:END -->

@@ -52,9 +52,23 @@
 ## 开源贡献
 
 <!-- OSS_CONTRIBUTIONS:START -->
+<details name="oss-page" open>
+<summary>第 1/2 页 · PR 1–10</summary>
+
 <p align="center">
   <a href="https://github.com/pulls?q=is%3Apr%20author%3Adafyy321-pixel%20is%3Amerged"><img src="./assets/contributions-zh.svg" width="100%" alt="自动更新的开源贡献记录"></a>
 </p>
+
+</details>
+
+<details name="oss-page">
+<summary>第 2/2 页 · PR 11–12</summary>
+
+<p align="center">
+  <a href="https://github.com/pulls?q=is%3Apr%20author%3Adafyy321-pixel%20is%3Amerged"><img src="./assets/contributions-zh-page-2.svg" width="100%" alt="自动更新的开源贡献记录"></a>
+</p>
+
+</details>
 
 [查看全部已合并的 Pull Requests →](https://github.com/pulls?q=is%3Apr%20author%3Adafyy321-pixel%20is%3Amerged)
 <!-- OSS_CONTRIBUTIONS:END -->

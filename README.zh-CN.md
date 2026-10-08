@@ -57,8 +57,8 @@
 </p>
 
 <hr>
-<p align="right">
-  <code>显示 1–10 / 共 12 条</code>&nbsp;&nbsp; <a href="./README.zh-CN.md#开源贡献"><img src="./assets/pager-01-active.svg" width="34" height="34" alt="第 1 页"></a> <a href="./assets/contributions-zh-page-2.md"><img src="./assets/pager-02.svg" width="34" height="34" alt="第 2 页"></a> <a href="./assets/contributions-zh-page-2.md"><img src="./assets/pager-next.svg" width="34" height="34" alt="下一页"></a>
+<p align="center">
+  <a href="./README.zh-CN.md#开源贡献"><img src="./assets/pager-prev-disabled.svg" width="34" height="34" alt="上一页"></a> <a href="./README.zh-CN.md#开源贡献"><img src="./assets/pager-01-active.svg" width="34" height="34" alt="第 1 页"></a> <a href="./assets/contributions-zh-page-2.md"><img src="./assets/pager-02.svg" width="34" height="34" alt="第 2 页"></a> <a href="./assets/contributions-zh-page-2.md"><img src="./assets/pager-next.svg" width="34" height="34" alt="下一页"></a>
 </p>
 
 [查看全部已合并的 Pull Requests →](https://github.com/pulls?q=is%3Apr%20author%3Adafyy321-pixel%20is%3Amerged)

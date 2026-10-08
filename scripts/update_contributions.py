@@ -325,41 +325,77 @@ def render_svg(
     return "\n".join(parts) + "\n"
 
 
-def render(prs: list[dict], username: str, language: str = "en") -> str:
+def pager_icon(label: str, active: bool = False, disabled: bool = False) -> str:
+    color = "#b9c9c4" if disabled else "#ffffff" if active else (
+        "#16866e" if label in ("←", "→") else "#26322f"
+    )
+    background = '<rect width="34" height="34" rx="3" fill="#26322f"/>' if active else ""
+    size = 17 if label in ("←", "→") else 12
+    return (
+        '<svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 34 34">\n'
+        f'  {background}\n'
+        f'  <text x="17" y="22" text-anchor="middle" fill="{color}" font-family="Consolas, monospace" font-size="{size}" font-weight="700">{label}</text>\n'
+        '</svg>\n'
+    )
+
+
+def page_document(language: str, page: int) -> str:
+    return asset_name(language, page).removesuffix(".svg") + ".md"
+
+
+def render(prs: list[dict], username: str, language: str = "en", page: int = 1, archive: bool = False) -> str:
     query = quote(f"is:pr author:{username} is:merged")
     url = f"https://github.com/pulls?q={query}"
     if language == "zh":
         alt = "自动更新的开源贡献记录"
         all_label = "查看全部已合并的 Pull Requests →"
+        profile = "README.zh-CN.md#开源贡献"
     else:
         alt = "Automatically updated open-source contributions"
         all_label = "View all merged pull requests →"
+        profile = "README.md#open-source-quest-log"
     pages = max(1, (len(prs) + PAGE_SIZE - 1) // PAGE_SIZE)
-    sections = []
-    for page in range(1, pages + 1):
-        asset = asset_name(language, page)
-        image = (
-            '<p align="center">\n'
-            f'  <a href="{url}"><img src="./assets/{asset}" width="100%" alt="{alt}"></a>\n'
-            "</p>"
-        )
-        if pages == 1:
-            sections.append(image)
-            continue
-        start = (page - 1) * PAGE_SIZE + 1
-        end = min(page * PAGE_SIZE, len(prs))
-        summary = (
-            f"第 {page}/{pages} 页 · PR {start}–{end}"
-            if language == "zh"
-            else f"Page {page}/{pages} · PRs {start}–{end}"
-        )
-        sections.append(
-            f'<details name="oss-page"{" open" if page == 1 else ""}>\n'
-            f"<summary>{summary}</summary>\n\n"
-            f"{image}\n\n"
-            "</details>"
-        )
-    return "\n\n".join(sections) + f"\n\n[{all_label}]({url})"
+    prefix = "./" if archive else "./assets/"
+    image = (
+        '<p align="center">\n'
+        f'  <a href="{url}"><img src="{prefix}{asset_name(language, page)}" width="100%" alt="{alt}"></a>\n'
+        '</p>'
+    )
+    if pages == 1:
+        return image + f"\n\n[{all_label}]({url})"
+
+    def href(target: int) -> str:
+        if target == 1:
+            return f"../{profile}" if archive else f"./{profile}"
+        return f"{prefix}{page_document(language, target)}"
+
+    def control(target: int | None, icon: str, title: str) -> str:
+        image_tag = f'<img src="{prefix}{icon}" width="34" height="34" alt="{title}">'
+        return f'<a href="{href(target)}">{image_tag}</a>' if target else image_tag
+
+    start = (page - 1) * PAGE_SIZE + 1
+    end = min(page * PAGE_SIZE, len(prs))
+    range_label = f"SHOWING {start:02d}–{end:02d} OF {len(prs)}" if language == "en" else f"显示 {start}–{end} / 共 {len(prs)} 条"
+    controls = [
+        control(page - 1 if page > 1 else None,
+                "pager-prev.svg" if page > 1 else "pager-prev-disabled.svg", "上一页" if language == "zh" else "Previous page")
+    ]
+    numbered = sorted({1, pages, *(n for n in range(page - 1, page + 2) if 1 <= n <= pages)})
+    for index, number in enumerate(numbered):
+        if index and number - numbered[index - 1] > 1:
+            controls.append("…")
+        controls.append(control(number if number != page else None,
+                                f"pager-{number:02d}{'-active' if number == page else ''}.svg",
+                                f"第 {number} 页" if language == "zh" else f"Page {number}"))
+    controls.append(control(page + 1 if page < pages else None,
+                            "pager-next.svg" if page < pages else "pager-next-disabled.svg", "下一页" if language == "zh" else "Next page"))
+    pager = (
+        '<hr>\n'
+        '<p align="right">\n'
+        f'  <code>{range_label}</code>&nbsp;&nbsp; ' + " ".join(controls) + '\n'
+        '</p>'
+    )
+    return image + "\n\n" + pager + f"\n\n[{all_label}]({url})"
 
 
 def asset_name(language: str, page: int) -> str:
@@ -429,9 +465,15 @@ def self_test() -> None:
     assert page_two.count('font-weight="700">example/project') == 1
     assert "/ #11" in page_one and "/ #1" in page_two and "/ #11" not in page_two
     paged_readme = render(paged_prs, "dafyy321-pixel")
-    assert '<details name="oss-page" open>' in paged_readme
-    assert 'assets/contributions-page-2.svg' in paged_readme
-    assert "Page 2/2 · PRs 11–11" in paged_readme
+    assert "<details" not in paged_readme
+    assert 'assets/contributions.svg' in paged_readme
+    assert 'href="./assets/contributions-page-2.md"' in paged_readme
+    assert "SHOWING 01–10 OF 11" in paged_readme
+    archived = render(paged_prs, "dafyy321-pixel", page=2, archive=True)
+    assert 'src="./contributions-page-2.svg"' in archived
+    assert 'href="../README.md#open-source-quest-log"' in archived
+    assert "SHOWING 11–11 OF 11" in archived
+    ET.fromstring(pager_icon("02", active=True))
     replaced = replace_section(f"before\n{START}\nold\n{END}\nafter\n", generated)
     assert "old" not in replaced and replaced.count(START) == replaced.count(END) == 1
     print("self-test passed")
@@ -466,6 +508,20 @@ def main() -> int:
                 assets_dir / asset_name(language, page),
                 render_svg(prs, stars, badges, language, page),
             )
+            if page > 1:
+                heading = "开源贡献" if language == "zh" else "Open-source quest log"
+                write_if_changed(
+                    assets_dir / page_document(language, page),
+                    f"# {heading}\n\n{render(prs, username, language, page, archive=True)}\n",
+                )
+    if pages > 1:
+        for page in range(1, pages + 1):
+            number = f"{page:02d}"
+            write_if_changed(assets_dir / f"pager-{number}.svg", pager_icon(number))
+            write_if_changed(assets_dir / f"pager-{number}-active.svg", pager_icon(number, active=True))
+        for direction, arrow in (("prev", "←"), ("next", "→")):
+            write_if_changed(assets_dir / f"pager-{direction}.svg", pager_icon(arrow))
+            write_if_changed(assets_dir / f"pager-{direction}-disabled.svg", pager_icon(arrow, disabled=True))
 
     for readme_path, language in (
         (Path(args.readme), "en"),

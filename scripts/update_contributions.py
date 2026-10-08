@@ -369,26 +369,25 @@ def render(prs: list[dict], username: str, language: str = "en", page: int = 1, 
             return f"../{profile}" if archive else f"./{profile}"
         return f"{prefix}{page_document(language, target)}"
 
-    def control(target: int | None, icon: str, title: str) -> str:
+    def control(target: int, icon: str, title: str) -> str:
         image_tag = f'<img src="{prefix}{icon}" width="34" height="34" alt="{title}">'
-        return f'<a href="{href(target)}">{image_tag}</a>' if target else image_tag
+        return f'<a href="{href(target)}">{image_tag}</a>'
 
     start = (page - 1) * PAGE_SIZE + 1
     end = min(page * PAGE_SIZE, len(prs))
     range_label = f"SHOWING {start:02d}–{end:02d} OF {len(prs)}" if language == "en" else f"显示 {start}–{end} / 共 {len(prs)} 条"
-    controls = [
-        control(page - 1 if page > 1 else None,
-                "pager-prev.svg" if page > 1 else "pager-prev-disabled.svg", "上一页" if language == "zh" else "Previous page")
-    ]
+    controls = []
+    if page > 1:
+        controls.append(control(page - 1, "pager-prev.svg", "上一页" if language == "zh" else "Previous page"))
     numbered = sorted({1, pages, *(n for n in range(page - 1, page + 2) if 1 <= n <= pages)})
     for index, number in enumerate(numbered):
         if index and number - numbered[index - 1] > 1:
             controls.append("…")
-        controls.append(control(number if number != page else None,
+        controls.append(control(number,
                                 f"pager-{number:02d}{'-active' if number == page else ''}.svg",
                                 f"第 {number} 页" if language == "zh" else f"Page {number}"))
-    controls.append(control(page + 1 if page < pages else None,
-                            "pager-next.svg" if page < pages else "pager-next-disabled.svg", "下一页" if language == "zh" else "Next page"))
+    if page < pages:
+        controls.append(control(page + 1, "pager-next.svg", "下一页" if language == "zh" else "Next page"))
     pager = (
         '<hr>\n'
         '<p align="right">\n'
@@ -468,10 +467,14 @@ def self_test() -> None:
     assert "<details" not in paged_readme
     assert 'assets/contributions.svg' in paged_readme
     assert 'href="./assets/contributions-page-2.md"' in paged_readme
+    assert 'href="./README.md#open-source-quest-log"><img src="./assets/pager-01-active.svg"' in paged_readme
+    assert "pager-prev-disabled.svg" not in paged_readme
     assert "SHOWING 01–10 OF 11" in paged_readme
     archived = render(paged_prs, "dafyy321-pixel", page=2, archive=True)
     assert 'src="./contributions-page-2.svg"' in archived
     assert 'href="../README.md#open-source-quest-log"' in archived
+    assert 'href="./contributions-page-2.md"><img src="./pager-02-active.svg"' in archived
+    assert "pager-next-disabled.svg" not in archived
     assert "SHOWING 11–11 OF 11" in archived
     ET.fromstring(pager_icon("02", active=True))
     replaced = replace_section(f"before\n{START}\nold\n{END}\nafter\n", generated)

@@ -50,7 +50,7 @@
 
 <hr>
 <p align="right">
-  <code>SHOWING 01–10 OF 12</code>&nbsp;&nbsp; <img src="./assets/pager-prev-disabled.svg" width="34" height="34" alt="Previous page"> <img src="./assets/pager-01-active.svg" width="34" height="34" alt="Page 1"> <a href="./assets/contributions-page-2.md"><img src="./assets/pager-02.svg" width="34" height="34" alt="Page 2"></a> <a href="./assets/contributions-page-2.md"><img src="./assets/pager-next.svg" width="34" height="34" alt="Next page"></a>
+  <code>SHOWING 01–10 OF 12</code>&nbsp;&nbsp; <a href="./README.md#open-source-quest-log"><img src="./assets/pager-01-active.svg" width="34" height="34" alt="Page 1"></a> <a href="./assets/contributions-page-2.md"><img src="./assets/pager-02.svg" width="34" height="34" alt="Page 2"></a> <a href="./assets/contributions-page-2.md"><img src="./assets/pager-next.svg" width="34" height="34" alt="Next page"></a>
 </p>
 
 [View all merged pull requests →](https://github.com/pulls?q=is%3Apr%20author%3Adafyy321-pixel%20is%3Amerged)
